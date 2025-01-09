@@ -5,17 +5,22 @@ import 'package:news_app/widgets/news_list_view.dart';
 
 class NewsListViewBuilder extends StatefulWidget {
   const NewsListViewBuilder({
-    super.key, required this.category,
+    super.key,
+    required this.category,
   });
-final String category;
+
+  final String category;
+
   @override
   State<NewsListViewBuilder> createState() => _NewsListViewBuilderState();
 }
 
 class _NewsListViewBuilderState extends State<NewsListViewBuilder> {
-  var future;
+  late Future<List<ArticleModel>> future; // Ensures proper type declaration
+
   @override
   void initState() {
+    super.initState();
     future = NewsService().getTopHeadLine(category: widget.category);
   }
 
@@ -24,18 +29,32 @@ class _NewsListViewBuilderState extends State<NewsListViewBuilder> {
     return FutureBuilder<List<ArticleModel>>(
       future: future,
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return NewsListView(articles: snapshot.data!);
-        } else if (snapshot.hasError) {
-          return SliverToBoxAdapter(
-            child: Center(
-              child: Text("oops there was an error,try later"),
-            ),
-          );
-        } else {
-          return SliverToBoxAdapter(
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SliverToBoxAdapter(
             child: Center(
               child: CircularProgressIndicator(),
+            ),
+          );
+        } else if (snapshot.hasError) {
+          return const SliverToBoxAdapter(
+            child: Center(
+              child: Text(
+                "Oops! There was an error. Please try again later.",
+                style: TextStyle(color: Colors.red, fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+          return NewsListView(articles: snapshot.data!);
+        } else {
+          return const SliverToBoxAdapter(
+            child: Center(
+              child: Text(
+                "No articles found for this category.",
+                style: TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
             ),
           );
         }

@@ -7,8 +7,12 @@ final String category;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        centerTitle: true,
+        title: Text(category,style: TextStyle(color: Colors.black),),),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 8.0),
         child: CustomScrollView(
           slivers: [
             NewsListViewBuilder(
